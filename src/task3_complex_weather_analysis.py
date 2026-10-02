@@ -6,8 +6,12 @@ except ImportError:
     from utils import load_json
 
 
-def analyze_daily_weather(day: Dict[str, Any], temp_threshold: float = 30, 
-                          wind_threshold: float = 15, humidity_threshold: float = 70) -> Dict[str, Any]:
+def analyze_daily_weather(
+    day: Dict[str, Any],
+    temp_threshold: float = 30,
+    wind_threshold: float = 15,
+    humidity_threshold: float = 70
+) -> Dict[str, Any]:
     """
     Analyze weather data for a single day.
 
@@ -20,7 +24,27 @@ def analyze_daily_weather(day: Dict[str, Any], temp_threshold: float = 30,
     Returns:
         dict: A dictionary with analysis results for the day.
     """
-    pass
+
+    max_temperature = day["max_temperature"]
+    min_temperature = day["min_temperature"]
+    wind_speed = day["wind_speed"]
+    humidity = day["humidity"]
+    precipitation = day["precipitation"]
+
+    return {
+        "date": day["date"],
+        "is_hot_day": max_temperature > temp_threshold,
+        "max_temperature": max_temperature,
+        "min_temperature": min_temperature,
+        "temperature_swing": max_temperature - min_temperature,
+        "is_windy_day": wind_speed >= wind_threshold,
+        "wind_speed": wind_speed,
+        "is_uncomfortable_day": humidity >= humidity_threshold,
+        "humidity": humidity,
+        "is_rainy_day": precipitation > 0,
+        "precipitation": precipitation,
+        "weather_description": day["weather_description"]
+    }
 
 
 def generate_daily_report(analysis: Dict[str, Any]) -> str:
@@ -33,10 +57,40 @@ def generate_daily_report(analysis: Dict[str, Any]) -> str:
     Returns:
         str: A detailed report as a string.
     """
-    pass
+
+    report = (
+        f"Weather report for {analysis['date']}: "
+        f"{analysis['weather_description']}. "
+    )
+
+    if analysis["is_hot_day"]:
+        report += "It was a hot day. "
+
+    if analysis["is_windy_day"]:
+        report += "It was a windy day. "
+
+    if analysis["is_uncomfortable_day"]:
+        report += "The weather was uncomfortable. "
+
+    report += (
+        f"Max {analysis['max_temperature']}°C, "
+        f"Min {analysis['min_temperature']}°C. "
+    )
+
+    if analysis["is_rainy_day"]:
+        report += (
+            f"Precipitation: "
+            f"{analysis['precipitation']} mm."
+        )
+    else:
+        report += "There was no precipitation."
+
+    return report
 
 
-def summarize_weather_analysis(analyses: List[Dict[str, Any]]) -> str:
+def summarize_weather_analysis(
+    analyses: List[Dict[str, Any]]
+) -> str:
     """
     Summarize the weather analysis over multiple days.
 
@@ -46,7 +100,40 @@ def summarize_weather_analysis(analyses: List[Dict[str, Any]]) -> str:
     Returns:
         str: A summary report as a string.
     """
-    pass
+
+    if not analyses:
+        return ""
+
+    hottest_day = max(
+        analyses,
+        key=lambda day: day["max_temperature"]
+    )
+
+    windiest_day = max(
+        analyses,
+        key=lambda day: day["wind_speed"]
+    )
+
+    most_humid_day = max(
+        analyses,
+        key=lambda day: day["humidity"]
+    )
+
+    rainiest_day = max(
+        analyses,
+        key=lambda day: day["precipitation"]
+    )
+
+    return (
+        f"Hottest day: {hottest_day['date']} "
+        f"with {hottest_day['max_temperature']}°C\n"
+        f"Windiest day: {windiest_day['date']} "
+        f"with {windiest_day['wind_speed']} km/h\n"
+        f"Most humid day: {most_humid_day['date']} "
+        f"with {most_humid_day['humidity']}%\n"
+        f"Rainiest day: {rainiest_day['date']} "
+        f"with {rainiest_day['precipitation']} mm"
+    )
 
 
 if __name__ == "__main__":
